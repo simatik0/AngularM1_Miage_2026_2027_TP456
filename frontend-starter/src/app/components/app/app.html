@@ -1,0 +1,63 @@
+<header class="site-header">
+  <a class="brand" routerLink="/" aria-label="Guitar Practice Cloud, accueil">
+    <span class="brand-mark" aria-hidden="true">♪</span>
+    <span class="brand-copy">
+      <b>Guitar Practice</b>
+      <small>YOUR SOUND. YOUR SPACE.</small>
+    </span>
+  </a>
+  <div class="header-actions">
+    <nav class="main-nav" aria-label="Navigation principale">
+      @if (auth.isAuthenticated()) {
+        <a routerLink="/tracks" routerLinkActive="is-active">Bibliothèque</a>
+        <a routerLink="/playlists" routerLinkActive="is-active">Playlists</a>
+        @if (auth.currentUser(); as user) {
+          <div class="profile-menu">
+            <button class="avatar-trigger" type="button" (click)="toggleProfileMenu()"
+              [attr.aria-expanded]="profileMenuOpen()" aria-haspopup="menu"
+              [attr.aria-label]="'Menu du profil de ' + user.name">
+              @if (auth.avatarUrl(); as avatar) {
+                <img [src]="avatar" alt="" />
+              } @else {
+                <span aria-hidden="true">♪</span>
+              }
+            </button>
+            @if (profileMenuOpen()) {
+              <div class="profile-dropdown" role="menu">
+                <a routerLink="/profile" role="menuitem" (click)="closeProfileMenu()">Mon profil</a>
+                <button type="button" role="menuitem" (click)="closeProfileMenu(); logout()">Déconnexion</button>
+              </div>
+            }
+          </div>
+        }
+      } @else {
+        <a class="button button--ghost" routerLink="/login">Connexion</a>
+        <a class="button button--primary" routerLink="/register">Créer un compte</a>
+      }
+    </nav>
+    <button class="theme-toggle" type="button" (click)="toggleTheme()"
+      [attr.aria-label]="theme() === 'dark' ? 'Activer le thème clair' : 'Activer le thème sombre'"
+      [attr.aria-pressed]="theme() === 'light'">
+      <span class="theme-toggle__icon" aria-hidden="true">{{ theme() === 'dark' ? '☼' : '☾' }}</span>
+      <span class="theme-toggle__label">{{ theme() === 'dark' ? 'Clair' : 'Sombre' }}</span>
+    </button>
+  </div>
+</header>
+
+@if (logoutError()) {
+  <p class="error" role="alert">{{ logoutError() }}</p>
+}
+@if (auth.sessionError()) {
+  <p class="error" role="alert">{{ auth.sessionError() }}</p>
+}
+
+<main #pageContainer>
+  <router-outlet (activate)="animatePage()" />
+</main>
+@if (auth.isAuthenticated()) {
+  <app-audio-player />
+}
+<footer class="site-footer">
+  <span>GUITAR PRACTICE CLOUD</span>
+  <span>Façonné pour vos sessions.</span>
+</footer>
